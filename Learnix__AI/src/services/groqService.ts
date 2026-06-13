@@ -3,7 +3,7 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 // TODO: Replace with your actual Groq API key
 // Get your free API key from: https://console.groq.com
-const GROQ_API_KEY = 'gsk_YOUR_GROQ_API_KEY_HERE';
+const GROQ_API_KEY = 'your_actual_groq_api_key';
 
 export class GroqService {
   private apiKey: string;
@@ -13,7 +13,7 @@ export class GroqService {
   }
 
   hasApiKey(): boolean {
-    return this.apiKey.length > 0 && this.apiKey !== 'gsk_YOUR_GROQ_API_KEY_HERE';
+    return this.apiKey.length > 0 && this.apiKey !== 'your_actual_groq_api_key';
   }
 
   async chat(messages: Array<{ role: string; content: string }>) {
