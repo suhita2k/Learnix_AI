@@ -8,7 +8,6 @@ export class GroqService {
 
   constructor() {
     this.apiKey = GROQ_API_KEY;
-    console.log('Groq API Key Loaded:', !!this.apiKey);
   }
 
   hasApiKey(): boolean {
@@ -17,14 +16,14 @@ export class GroqService {
 
   async chat(messages: Array<{ role: string; content: string }>) {
     if (!this.apiKey) {
-      throw new Error('Groq API key not set');
+      throw new Error('Groq API key not configured');
     }
 
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
@@ -43,5 +42,100 @@ export class GroqService {
     return data.choices[0].message.content;
   }
 
-  // Keep all your existing methods below unchanged
+  async generateSummary(text: string): Promise<string> {
+    return this.chat([
+      {
+        role: 'system',
+        content:
+          'You are a helpful study assistant. Generate clear, concise summaries of educational content.',
+      },
+      {
+        role: 'user',
+        content: `Please provide a comprehensive summary of the following notes:\n\n${text}`,
+      },
+    ]);
+  }
+
+  async generateKeyPoints(text: string): Promise<string> {
+    return this.chat([
+      {
+        role: 'system',
+        content:
+          'You are a helpful study assistant. Extract key points from educational content.',
+      },
+      {
+        role: 'user',
+        content: `Please extract and list the most important points from the following notes:\n\n${text}`,
+      },
+    ]);
+  }
+
+  async generate2MarkQuestions(text: string): Promise<string> {
+    return this.chat([
+      {
+        role: 'system',
+        content:
+          'You are an expert educator. Generate 2-mark questions with answers.',
+      },
+      {
+        role: 'user',
+        content: `Generate 10 two-mark questions with answers from:\n\n${text}`,
+      },
+    ]);
+  }
+
+  async generate16MarkQuestions(text: string): Promise<string> {
+    return this.chat([
+      {
+        role: 'system',
+        content:
+          'You are an expert educator. Generate 16-mark questions with detailed answers.',
+      },
+      {
+        role: 'user',
+        content: `Generate 5 sixteen-mark questions with detailed answers from:\n\n${text}`,
+      },
+    ]);
+  }
+
+  async answerQuestion(
+    question: string,
+    context: string
+  ): Promise<string> {
+    return this.chat([
+      {
+        role: 'system',
+        content:
+          'You are a helpful study assistant. Provide clear explanations.',
+      },
+      {
+        role: 'user',
+        content: context
+          ? `Context: ${context}\n\nQuestion: ${question}`
+          : question,
+      },
+    ]);
+  }
+
+  async generateStudyPlan(
+    examDate: string,
+    subjects: string[],
+    currentDate: string
+  ): Promise<string> {
+    return this.chat([
+      {
+        role: 'system',
+        content:
+          'You are an expert study planner. Create effective study schedules.',
+      },
+      {
+        role: 'user',
+        content: `Create a study plan from ${currentDate} to ${examDate} for: ${subjects.join(
+          ', '
+        )}`,
+      },
+    ]);
+  }
 }
+
+export const groqService = new GroqService();
