@@ -1,4 +1,3 @@
-````ts
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
@@ -99,46 +98,6 @@ export class GroqService {
     ]);
   }
 
-  async generateMCQQuiz(
-    text: string,
-    numQuestions: number = 10
-  ): Promise<any[]> {
-    const response = await this.chat([
-      {
-        role: 'system',
-        content: `Generate multiple choice questions.
-Return ONLY valid JSON.
-Do not include markdown.
-
-Format:
-[
-  {
-    "question": "Question?",
-    "options": ["A", "B", "C", "D"],
-    "correctAnswer": 0
-  }
-]`,
-      },
-      {
-        role: 'user',
-        content: `Generate ${numQuestions} MCQ questions from:\n\n${text}`,
-      },
-    ]);
-
-    try {
-      const cleanedResponse = response
-        .replace(/```json/g, '')
-        .replace(/```/g, '')
-        .trim();
-
-      return JSON.parse(cleanedResponse);
-    } catch (error) {
-      console.error('MCQ Parse Error:', error);
-      console.error('Response:', response);
-      throw new Error('Failed to generate MCQ quiz');
-    }
-  }
-
   async answerQuestion(
     question: string,
     context: string
@@ -157,6 +116,42 @@ Format:
       },
     ]);
   }
+  async generateMCQQuiz(text: string, numQuestions: number = 10): Promise<any[]> {
+  const response = await this.chat([
+    {
+      role: 'system',
+      content: `Generate multiple choice questions.
+Return ONLY valid JSON.
+Do not include markdown.
+Format:
+
+[
+  {
+    "question": "Question?",
+    "options": ["A", "B", "C", "D"],
+    "correctAnswer": 0
+  }
+]`
+    },
+    {
+      role: 'user',
+      content: `Generate ${numQuestions} MCQ questions from:\n\n${text}`
+    }
+  ]);
+
+  try {
+    const cleanedResponse = response
+      .replace(/```json/g, '')
+      .replace(/```/g, '')
+      .trim();
+
+    return JSON.parse(cleanedResponse);
+  } catch (error) {
+    console.error('MCQ Parse Error:', error);
+    console.error('Response:', response);
+    throw new Error('Failed to generate MCQ quiz');
+  }
+}
 
   async generateStudyPlan(
     examDate: string,
@@ -180,4 +175,3 @@ Format:
 }
 
 export const groqService = new GroqService();
-````
